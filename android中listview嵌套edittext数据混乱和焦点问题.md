@@ -11,13 +11,37 @@
 	{  super(ctx);   }  
 
 	publicExtendedEditText(Context ctx,AttributeSetattrs)  
-  	{  super(ctx, attrs);   }   
+	{  super(ctx, attrs);   }   
 
 	publicExtendedEditText(Context ctx,AttributeSetattrs,intdefStyle)
 	{ super(ctx, attrs, defStyle);   }
 
 
-	@Override  public void addTextChangedListener(TextWatcher watcher)  {    
+	@Override
+    public boolean onTouchEvent(MotionEvent event) {
+        if(event.getAction()==MotionEvent.ACTION_UP){
+        //当触摸控件时让edittext获取焦点
+            setFocusable(true);
+            setFocusableInTouchMode(true);
+            requestFocus();
+            requestFocusFromTouch();
+        }
+
+        return super.onTouchEvent(event);
+    }
+
+
+    @Override
+    protected void onTextChanged(CharSequence text, int start, int lengthBefore, int lengthAfter) {
+    //在edittext内容改变后将edittext的光标移到最尾端
+        setSelection(lengthAfter);
+        super.onTextChanged(text, start, lengthBefore, lengthAfter);
+    }
+
+
+
+	@Override  
+	public void addTextChangedListener(TextWatcher watcher)  {    
        if (mListeners == null) { 
           mListeners = newArrayList<TextWatcher>(); 
         }
@@ -27,7 +51,8 @@
 
 
 
-	@Override  public void removeTextChangedListener(TextWatcher watcher)   {
+	@Override  
+	public void removeTextChangedListener(TextWatcher watcher)   {
              if (mListeners != null){  
                 inti = mListeners.indexOf(watcher); 
                 if (i>= 0) { 
@@ -142,11 +167,13 @@
             Person p = personList.get(pos);
             switch (type) {
                 case NOTIFY_TV:
-                    holder.name.setText(p.getName());//只刷新tv
+                    holder.name.setText(p.getName());//只刷新tv,
                     break;
                 case NOTIFY_ET:
                     Log.i("log","刷新的Notify_ET，执行了么:"+position);
-                    holder.age.setText(p.getAge()+"");//只刷新et
+                    holder.age.setText(p.getAge()+"");
+                    //只刷新et,这里容易出错，如果p.getAge()是数字型，不把它转成字符型，setText()就会去找这个string的id，
+                    //而这个id的string我们没设，就会报错               
                     break;
                 case NOTIFY_IV:
 
